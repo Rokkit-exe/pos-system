@@ -13,7 +13,7 @@ import PriceContainer from '../components/MainPanel/SidePanel/PriceContainer'
 import SidePanel from '../components/MainPanel/SidePanel/SidePanel'
 import StatusContainer from '../components/Header/StatusContainer'
 import TopSidePanelContainer from '../components/MainPanel/SidePanel/TopSidePanelContainer'
-import NoteContainer from '../components/MainPanel/MidPanel/NoteContainer'
+import InputContainer from '../components/MainPanel/MidPanel/InputContainer'
 import ItemsList from '../components/MainPanel/MidPanel/ItemsList'
 import FooterContainer from '../components/Footer/FooterContainer'
 import FooterButtonList from '../components/Footer/FooterButtonList'
@@ -43,7 +43,10 @@ function Main() {
     const [orders, setOrders] = useState()
     const [note, setNote] = useState("")
 
-    const [showNoteBox, setShowNoteBox] = useState(false)
+    const [showInputBox, setShowInputBox] = useState(false)
+    const [clientName , setClientName] = useState("")
+    const [inputType, setInputType] = useState("")
+
 
     const isClientActive = (client) => client.cart.length >= 1 || client.articles.length >= 1
     const isTableActive = (table) => table.clients.forEach((client) => isClientActive(client) ? true : undefined)
@@ -90,8 +93,14 @@ function Main() {
     const addNote = () => {
         setCurClient({...curClient, cart: curClient.cart.map((elem => selectedItem === elem ? {...elem, note: note}: elem))})
         setNote("")
-        setShowNoteBox(false)
+        setShowInputBox(false)
     }
+
+    const addClientName = () => {
+        setCurClient({...curClient, name: clientName})
+        setClientName("")
+        setShowInputBox(false)
+    }   
 
     useEffect(() => {
         fetchProducts("categories")
@@ -131,7 +140,7 @@ function Main() {
                     <i className="bi bi-people icons px-3" onClick={() => navigate("/pivot", {state: {user: user, table: table}})}></i>
                     <i className="bi bi-caret-right icons px-3" onClick={() => changeClient(table.clients[curClient.id])}></i>
                 </div>
-                <StatusContainer username={user.name} tableNumber={table.id} clientNumber={curClient.id}/>
+                <StatusContainer username={user.name} tableNumber={table.id} clientNumber={curClient.id} curClient={curClient}/>
             </Header>
             <MainPanel>
                 {/* left panel */}
@@ -149,9 +158,15 @@ function Main() {
 
                 <MidPanel>
                     <ItemsList items={items} itemClick={addItemToCart}/>
-                    <NoteContainer note={note} setNote={setNote} addNote={addNote} showNoteBox={showNoteBox}/>
+                    if (showInputBox) {
+                        showInputBox ? 
+                            inputType === "note" ?
+                                <InputContainer input={note} setInput={setNote} onClick={addNote} />
+                                : 
+                                <InputContainer input={clientName} setInput={setClientName} onClick={addClientName}/>
+                            : undefined
+                    }
                 </MidPanel>
-                
 
                 {/* right panel */}
                 <SidePanel>
@@ -170,7 +185,7 @@ function Main() {
                     <FooterButton title="Supprimer" color="red" icon="bi-x-lg" click={() => removeItemFromCart(selectedItem)}/>
                     <FooterButton title="Ingredients" color="orange" icon="bi-card-checklist" click={() => true}/>
                     <FooterButton title="Services" color="pink" icon="bi-list-ol" click={() => true}/>
-                    <FooterButton title="Notes" color="lightblue" icon="bi-chat-right-text" click={() => setShowNoteBox(!showNoteBox)}/>
+                    <FooterButton title="Notes" color="lightblue" icon="bi-chat-right-text" click={() => setShowInputBox(!showInputBox)}/>
                     <FooterButton title="Payment" color="blue" icon="bi-credit-card" click={() => true}/>
                     <FooterButton title="Annuler" color="red" icon="bi-slash-circle" click={() => true}/>
                     <FooterButton title="Continuer" color="green" icon="bi-check-circle" click={() => handlePunch()}/>

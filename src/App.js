@@ -20,7 +20,7 @@ function App() {
           <Route path='/table' element={<Table/>}/>
           <Route path='/pivot' element={<Pivot/>}/>
         </Routes>
-      </Router>    
+      </Router>
   );
 }
 
